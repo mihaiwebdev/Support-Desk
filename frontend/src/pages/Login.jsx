@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { FaSignInAlt } from 'react-icons/fa'
 import { useSelector, useDispatch } from 'react-redux'
-import { login, reset } from '../features/auth/authSlice'
+import { login } from '../features/auth/authSlice'
 import { toast } from 'react-toastify'
 import Spinner from '../components/Spinner'
 
@@ -18,25 +18,7 @@ function Login() {
     const dispatch = useDispatch()
     const navigate = useNavigate()
 
-    const {user, isLoading, isSuccess, message, isError} = 
-    useSelector((state) => state.auth)
-
-    useEffect(() => {
-       
-        if (isError) {
-            toast.error(message)
-        }
-
-        // Redirect when logged in 
-        if (isSuccess || user) {
-            navigate('/')
-        }
-        
-        dispatch(reset())
-        
-
-    }, [user, isError, isSuccess, message, navigate, dispatch])
-
+    const { isLoading } = useSelector((state) => state.auth)
 
     const onChange = (e) => {
         setFormData((prevState) => ({
@@ -45,6 +27,10 @@ function Login() {
         }))
     }
 
+    // NOTE: no need for useEffect here as we can catch the
+    // AsyncThunkAction rejection in our onSubmit or redirect them on the
+    // resolution
+
     const onSubmit = (e) => {
         e.preventDefault()
 
@@ -52,7 +38,14 @@ function Login() {
             email,
             password
         }
-        dispatch(login(userData))
+        dispatch(login(userData)).unwrap().then((user) => {
+            // NOTE: by unwrapping the AsyncThunkAction we can navigate the user after
+            // getting a good response from our API or catch the AsyncThunkAction
+            // rejection to show an error message
+            toast.success(`Logged in as ${user.name}`)
+            navigate('/')
+        })
+        .catch(toast.error)
         
     }
 

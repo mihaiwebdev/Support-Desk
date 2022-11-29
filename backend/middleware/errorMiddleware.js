@@ -1,6 +1,8 @@
-const errorHandler = (err, req, res, next) => {
+const errorHandler = (err, _, res, next) => {
+    // Fix: check for bad status codes.
 
-    const statusCode = res.statusCode ? res.statusCode : 500
+    const statusCode = res.statusCode < 400 ? 500 : res.statusCode
+    
     res.status(statusCode)
     res.json({
         message: err.message,
@@ -8,4 +10,4 @@ const errorHandler = (err, req, res, next) => {
     })
 }
 
-module.exports = {errorHandler}
+module.exports = { errorHandler }

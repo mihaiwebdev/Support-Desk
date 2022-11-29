@@ -3,7 +3,7 @@ import {useNavigate} from 'react-router-dom'
 import {toast} from 'react-toastify'
 import {FaUser} from 'react-icons/fa'
 import {useSelector, useDispatch} from 'react-redux'
-import {register, reset} from '../features/auth/authSlice'
+import {register} from '../features/auth/authSlice'
 import Spinner from '../components/Spinner'
 
 function Register() {
@@ -34,8 +34,6 @@ function Register() {
         if (isSuccess || user) {
             navigate('/')
         }
-
-        dispatch(reset())
 
     }, [isError, isSuccess, user, message, navigate, dispatch])
 
